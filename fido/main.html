@@ -1,0 +1,480 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Progress Tracker</title>
+        <link rel="stylesheet" href="static/style.css"> 
+        <script src="https://kit.fontawesome.com/999afff8dc.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    </head>
+    
+    <body>
+        <div class="button-div">
+            <button id="myBtn">+ Add New Item</button>
+        </div>
+        
+        <div class="list">
+            <div class="to_do" id="to_do">
+                <h2>To Do</h2>
+            </div>
+            
+            <div id="in_progress" class="in_progress">
+                <h2>In Progress</h2>
+            </div>
+            
+            <div id="done" class="done">
+                <h2>Done</h2>
+            </div>
+        </div>
+        
+        
+        <div id="myModal" class="modal">
+          <!-- Модальное содержание -->
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            
+              <form onsubmit="store()" class="my-form">
+              <label for="heading">Title</label>
+                  <br>
+              <input type="text" id="heading" name="heading" required maxlength="50"><br><br>
+              <label for="body">Description</label>
+                  <br>
+              <textarea id="body" name="body" maxlength="500"></textarea><br><br>
+              <input class="subm-button" type="submit">
+            </form>
+            
+          </div>
+
+        </div>
+        
+        
+    
+        <!-- ///////////////////////////////////////////// -->
+        
+        
+        <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+        var btn = document.getElementById("myBtn");
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+        
+        </script>
+        
+        <script>
+            // add new activity
+            function store(){                
+                
+                /*
+                delete localStorage.toDoHeading;
+                delete localStorage.toDoBody;
+                delete localStorage.inProgHeading;
+                delete localStorage.inProgBody;
+                */
+                
+                let array = [];
+                
+                let inputHeading = document.getElementById("heading").value;
+                
+                if(!localStorage.toDoHeading){
+                    localStorage.toDoHeading = JSON.stringify(array);
+                }
+                let ToDoHead = JSON.parse(localStorage.toDoHeading);
+ 
+                ToDoHead.push(inputHeading);
+                localStorage.toDoHeading = JSON.stringify(ToDoHead);
+                ToDoHead = JSON.parse(localStorage.toDoHeading);
+                
+                /*
+                for (let key in ToDoHead) {
+                  alert( ToDoHead[key] );
+                }
+                */
+                
+                //////////////////////////////////////////////////////////////
+                
+                let inputBody = document.getElementById("body").value;
+                
+                if(!localStorage.toDoBody){
+                    localStorage.toDoBody = JSON.stringify(array);
+                }
+                let ToDoBody = JSON.parse(localStorage.toDoBody);
+ 
+                ToDoBody.push(inputBody);
+                localStorage.toDoBody = JSON.stringify(ToDoBody);
+                ToDoBody = JSON.parse(localStorage.toDoBody);
+                
+                /*
+                for (let key in ToDoBody) {
+                  alert( ToDoBody[key] );
+                }    
+                */
+            }
+        
+        </script>
+        
+        <script>
+        // add activities to the page
+        let ToDoHead = JSON.parse(localStorage.toDoHeading);
+        let ToDoBody = JSON.parse(localStorage.toDoBody);
+        var i = 0;
+            
+            for (let key in ToDoBody) {
+                var div = document.createElement("div");
+                var head = document.createElement("div");
+                var body = document.createElement("div");
+                
+                // add button
+                let menu_button = document.createElement("button");
+                menu_button.innerHTML = "<i class='fas fa-ellipsis-h'></i>";
+                menu_button.className = "menu_button";
+                menu_button.id = "menu_button_" + i;
+                div.append(menu_button);
+                
+                // add head and body
+                head.innerHTML = ToDoHead[key];
+                body.innerHTML = ToDoBody[key];
+                div.appendChild(head);  
+                div.appendChild(body);
+                head.id = "card_head";
+                body.id = "card_body";
+                div.id = "card";
+                document.getElementById("to_do").appendChild(div);
+                
+                
+                //add more button
+                var more_div = document.createElement("div");
+                more_div.innerHTML = "<div class='dropdown-content'> <button onclick='delete_func(this)' class = 'delete_btn' id='delete_button_" + i + "'>Delete</button> <button onclick='move_to_prog(this)' class='move_btn' id='move_to_prog_" + i + "'>Move to In Progress</button></div>";
+                more_div.id = "more_div_" + i;
+                more_div.className = "more_div";
+                more_div.style = "display:none";
+                menu_button.appendChild(more_div);
+                
+                menu_button.onclick= function() {let num = menu_button.id; var cur_more_div = document.getElementById("more_div_" + num.substring(12, num.length)); cur_more_div.style = "display: block"};
+                
+                i += 1;
+            }                
+            
+        var div = document.createElement("div");
+        div.style.width = "100px";
+        div.style.height = "100px";
+        div.style.background = "red";
+        div.style.color = "white";
+        div.innerHTML = "Hello";
+
+        
+        </script>
+        
+        <script>
+            //show menu
+            $(document).on('click', function(e) {
+                var x = document.getElementsByClassName("more_div");
+                var i;
+                for (i = 0; i < x.length; i++) {
+                  if (!$(e.target).closest(x[i]).length && !$(e.target).closest(".menu_button").length) {
+                    $(x[i]).hide();
+                  }
+                  e.stopPropagation();
+                }
+            });
+              
+            // delete item from to_do
+            function delete_func(elem){
+                var num = elem.id.substring(14, elem.id.length);
+                
+                let ToDoHead = JSON.parse(localStorage.toDoHeading);
+                let ToDoBody = JSON.parse(localStorage.toDoBody);
+                
+                ToDoHead.splice(num, 1);
+                ToDoBody.splice(num, 1);
+                
+                localStorage.toDoHeading = JSON.stringify(ToDoHead);
+                localStorage.toDoBody = JSON.stringify(ToDoBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            function delete_func_1(elem){
+                var num = elem.id.substring(14, elem.id.length);
+                
+                let InProgHead = JSON.parse(localStorage.inProgHeading);
+                let InProgBody = JSON.parse(localStorage.inProgBody);
+                
+                InProgHead.splice(num, 1);
+                InProgBody.splice(num, 1);
+                
+                localStorage.inProgHeading = JSON.stringify(InProgHead);
+                localStorage.inProgBody = JSON.stringify(InProgBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            function delete_func_2(elem){
+                var num = elem.id.substring(14, elem.id.length);
+                
+                let DoneHead = JSON.parse(localStorage.doneHeading);
+                let DoneBody = JSON.parse(localStorage.doneBody);
+                
+                DoneHead.splice(num, 1);
+                DoneBody.splice(num, 1);
+                
+                localStorage.doneHeading = JSON.stringify(DoneHead);
+                localStorage.doneBody = JSON.stringify(DoneBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            function move_to_prog(elem){
+                
+                //delete localStorage.inProgHeading;
+                //delete localStorage.inProgBody;
+                
+                var num = elem.id.substring(13, elem.id.length);
+                
+                let ToDoHead = JSON.parse(localStorage.toDoHeading);
+                let ToDoBody = JSON.parse(localStorage.toDoBody);
+                
+                var head = ToDoHead[num];
+                var body = ToDoBody[num];
+                
+                
+                let array = [];
+                if(!localStorage.inProgHeading){
+                    localStorage.inProgHeading = JSON.stringify(array);
+                }
+
+                if(!localStorage.inProgBody){
+                    localStorage.inProgBody = JSON.stringify(array);
+                }
+                
+                let InProgHead = JSON.parse(localStorage.inProgHeading);
+                let InProgBody = JSON.parse(localStorage.inProgBody);
+                
+                InProgHead.push(head);
+                localStorage.inProgHeading = JSON.stringify(InProgHead);
+                
+                InProgBody.push(body);
+                localStorage.inProgBody = JSON.stringify(InProgBody);
+                
+                ToDoHead.splice(num, 1);
+                ToDoBody.splice(num, 1);
+                
+                localStorage.toDoHeading = JSON.stringify(ToDoHead);
+                localStorage.toDoBody = JSON.stringify(ToDoBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            function move_to_done(elem){
+                
+                //delete localStorage.inProgHeading;
+                //delete localStorage.inProgBody;
+                
+                var num = elem.id.substring(13, elem.id.length);
+                
+                let InProgHead = JSON.parse(localStorage.inProgHeading);
+                let InProgBody = JSON.parse(localStorage.inProgBody);
+                
+                var head = InProgHead[num];
+                var body = InProgBody[num];
+                
+                
+                let array = [];
+                if(!localStorage.doneHeading){
+                    localStorage.doneHeading = JSON.stringify(array);
+                }
+
+                if(!localStorage.doneBody){
+                    localStorage.doneBody = JSON.stringify(array);
+                }
+                
+                let DoneHead = JSON.parse(localStorage.doneHeading);
+                let DoneBody = JSON.parse(localStorage.doneBody);
+                
+                DoneHead.push(head);
+                localStorage.doneHeading = JSON.stringify(DoneHead);
+                
+                DoneBody.push(body);
+                localStorage.doneBody = JSON.stringify(DoneBody);
+                
+                InProgHead.splice(num, 1);
+                InProgBody.splice(num, 1);
+                
+                localStorage.inProgHeading = JSON.stringify(InProgHead);
+                localStorage.inProgBody = JSON.stringify(InProgBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            function move_back_do(elem){
+                
+                var num = elem.id.substring(13, elem.id.length);
+                
+                let ToDoHead = JSON.parse(localStorage.toDoHeading);
+                let ToDoBody = JSON.parse(localStorage.toDoBody);
+                
+                let InProgHead = JSON.parse(localStorage.inProgHeading);
+                let InProgBody = JSON.parse(localStorage.inProgBody);
+                
+                var head = InProgHead[num];
+                var body = InProgBody[num];
+                 
+                ToDoHead.push(head);
+                localStorage.toDoHeading = JSON.stringify(ToDoHead);
+                
+                ToDoBody.push(body);
+                localStorage.toDoBody = JSON.stringify(ToDoBody);
+                
+                InProgHead.splice(num, 1);
+                InProgBody.splice(num, 1);
+                
+                localStorage.inProgHeading = JSON.stringify(InProgHead);
+                localStorage.inProgBody = JSON.stringify(InProgBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            function move_back_pr(elem){
+                
+                var num = elem.id.substring(13, elem.id.length);
+                
+                let InProgHead = JSON.parse(localStorage.inProgHeading);
+                let InProgBody = JSON.parse(localStorage.inProgBody);
+                
+                let DoneHead = JSON.parse(localStorage.doneHeading);
+                let DoneBody = JSON.parse(localStorage.doneBody);
+                
+                var head = DoneHead[num];
+                var body = DoneBody[num]; 
+                
+                InProgHead.push(head);
+                localStorage.inProgHeading = JSON.stringify(InProgHead);
+                
+                InProgBody.push(body);
+                localStorage.inProgBody = JSON.stringify(InProgBody);
+                
+                DoneHead.splice(num, 1);
+                DoneBody.splice(num, 1);
+                
+                localStorage.doneHeading = JSON.stringify(DoneHead);
+                localStorage.doneBody = JSON.stringify(DoneBody);
+                  
+                window.location.reload(true); 
+            }
+            
+            
+            
+        </script>
+        
+        <script>
+        // add activities to the page IN_PROG
+        let InProgHead = JSON.parse(localStorage.inProgHeading);
+        let InProgBody = JSON.parse(localStorage.inProgBody);
+        var i = 0;
+            
+            for (let key in InProgBody) {
+                var div = document.createElement("div");
+                var head = document.createElement("div");
+                var body = document.createElement("div");
+                
+                // add button
+                let menu_button = document.createElement("button");
+                menu_button.innerHTML = "<i class='fas fa-ellipsis-h'></i>";
+                menu_button.className = "menu_button";
+                menu_button.id = "menu_button_" + i;
+                div.append(menu_button);
+                
+                // add head and body
+                head.innerHTML = InProgHead[key];
+                body.innerHTML = InProgBody[key];
+                div.appendChild(head);  
+                div.appendChild(body);
+                head.id = "card_head";
+                body.id = "card_body";
+                div.id = "card";
+                document.getElementById("in_progress").appendChild(div);
+                
+                
+                //add more button
+                var more_div = document.createElement("div");
+                more_div.innerHTML = "<div class='dropdown-content'> <button onclick='delete_func_1(this)' class = 'delete_btn' id='delete_button_" + i + "'>Delete</button> <button onclick='move_to_done(this)' class='move_btn' id='move_to_done_" + i + "'>Move to Done</button> <button onclick='move_back_do(this)' class='move_btn' id='move_back_do_" + i + "'>Move to To Do</button></div>";
+                more_div.id = "more_div_1_" + i;
+                more_div.className = "more_div";
+                more_div.style = "display:none";
+                menu_button.appendChild(more_div);
+                
+                menu_button.onclick= function() {let num = menu_button.id; var cur_more_div = document.getElementById("more_div_1_" + num.substring(12, num.length)); cur_more_div.style = "display: block"};
+                
+                i += 1;
+            }                
+            
+        var div = document.createElement("div");
+        div.style.width = "100px";
+        div.style.height = "100px";
+        div.style.background = "red";
+        div.style.color = "white";
+        div.innerHTML = "Hello";
+
+        
+        </script>
+        
+        <script>
+        // add activities to the page DONE
+        let DoneHead = JSON.parse(localStorage.doneHeading);
+        let DoneBody = JSON.parse(localStorage.doneBody);
+        var i = 0;
+            
+            for (let key in DoneBody) {
+                var div = document.createElement("div");
+                var head = document.createElement("div");
+                var body = document.createElement("div");
+                
+                // add button
+                let menu_button = document.createElement("button");
+                menu_button.innerHTML = "<i class='fas fa-ellipsis-h'></i>";
+                menu_button.className = "menu_button";
+                menu_button.id = "menu_button_" + i;
+                div.append(menu_button);
+                
+                // add head and body
+                head.innerHTML = DoneHead[key];
+                body.innerHTML = DoneBody[key];
+                div.appendChild(head);  
+                div.appendChild(body);
+                head.id = "card_head";
+                body.id = "card_body";
+                div.id = "card";
+                document.getElementById("done").appendChild(div);
+                
+                
+                //add more button
+                var more_div = document.createElement("div");
+                more_div.innerHTML = "<div style='margin-left: -80px' class='dropdown-content'> <button onclick='delete_func_2(this)' class = 'delete_btn' id='delete_button_" + i + "'>Delete</button> <button onclick='move_back_pr(this)' class='move_btn' id='move_back_pr_" + i + "'>Move to In Progress</button> </div>";
+                more_div.id = "more_div_2_" + i;
+                more_div.className = "more_div";
+                more_div.style = "display:none";
+                menu_button.appendChild(more_div);
+                
+                menu_button.onclick= function() {let num = menu_button.id; var cur_more_div = document.getElementById("more_div_2_" + num.substring(12, num.length)); cur_more_div.style = "display: block"};
+                
+                i += 1;
+            }                
+            
+        var div = document.createElement("div");
+        div.style.width = "100px";
+        div.style.height = "100px";
+        div.style.background = "red";
+        div.style.color = "white";
+        div.innerHTML = "Hello";
+
+        
+        </script>
+        
+    </body>
+</html>
